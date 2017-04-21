@@ -1,0 +1,9 @@
+plugin.description: Sends a discord webhook notification when a torrent event is caught.
+plugin.author: rdn
+plugin.version: 1.0
+plugin.runlevel: 11
+rtorrent.remote: error
+rtorrent.external.error: php
+rtorrent.php.error: discord.php,push.php
+php.extensions.error: json
+plugin.help: https://github.com/Novik/ruTorrent/wiki/
