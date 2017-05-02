@@ -40,7 +40,12 @@ class Discord {
     }
     public function get()
     {
-        return("theWebUI.discord = ".safe_json_encode($this->log).";");
+        if (function_exists("safe_json_encode")) {
+            return("theWebUI.discord = ".safe_json_encode($this->log).";");
+        } else {
+            // We dont really need safe_json_encode here since we dont store any values other than numeric and hash values, but sometimes this throws an error
+            return("theWebUI.discord = ".json_encode($this->log).";");
+        }
     }
 
     public function setHandlers()
