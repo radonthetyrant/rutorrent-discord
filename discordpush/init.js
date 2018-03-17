@@ -12,6 +12,8 @@ if(plugin.canChangeOptions())
         if(plugin.enabled)
         {
             $('#discord_webhook').val( theWebUI.discord.discord_webhook );
+            $('#discord_avatar').val( theWebUI.discord.discord_avatar );
+            $('#discord_pushuser').val( theWebUI.discord.discord_pushuser );
             $$('discord_enabled').checked = ( theWebUI.discord.discord_enabled != 0 );
             $$('discord_addition').checked = ( theWebUI.discord.discord_addition != 0 );
             $$('discord_finish').checked = ( theWebUI.discord.discord_finish != 0 );
@@ -30,6 +32,8 @@ if(plugin.canChangeOptions())
         ($$('discord_addition').checked != ( theWebUI.discord.discord_addition != 0 )) ||
         ($$('discord_finish').checked != ( theWebUI.discord.discord_finish != 0 )) ||
         ($$('discord_deletion').checked != ( theWebUI.discord.discord_deletion != 0 )) ||
+        ($('#discord_avatar').val() != theWebUI.discord.discord_webhook) ||
+        ($('#discord_pushuser').val() != theWebUI.discord.discord_webhook) ||
         ($('#discord_webhook').val() != theWebUI.discord.discord_webhook));
     }
 
@@ -48,6 +52,8 @@ if(plugin.canChangeOptions())
             "&discord_deletion=" + ( $$('discord_deletion').checked  ? '1' : '0' ) +
             "&discord_finish=" + ( $$('discord_finish').checked  ? '1' : '0' ) +
             "&discord_enabled=" + ( $$('discord_enabled').checked  ? '1' : '0' ) +
+            "&discord_avatar=" + $('#discord_avatar').val() +
+            "&discord_pushuser=" + $('#discord_pushuser').val() +
             "&discord_webhook=" + $('#discord_webhook').val();
 
         this.contentType = "application/x-www-form-urlencoded";
@@ -159,11 +165,21 @@ plugin.onLangLoaded = function()
             "<fieldset>"+
             "<legend><a href='https://discordapp.com/developers/applications/me' target='_blank'>Discord Notifications</a></legend>"+
             "<div class='checkbox'>" +
-            "<input type='checkbox' id='discord_enabled' onchange=\"linked(this, 0, ['discord_webhook','discord_addition','discord_deletion','discord_finish']);\"/>"+
+            "<input type='checkbox' id='discord_enabled' onchange=\"linked(this, 0, ['discord_webhook','discord_avatar','discord_pushuser','discord_addition','discord_deletion','discord_finish']);\"/>"+
             "<label for='discord_enabled'>Enabled</label>"+
             "</div>" +
+            "<div>" +
             "<label for='discord_webhook' id='lbl_discord_webhook' class='disabled'>Discord Webhook URL</label>"+
             "<input type='text' id='discord_webhook' class='TextboxLarge' disabled='true' />"+
+            "</div>" +
+            "<div>" +
+            "<label for='discord_avatar' id='lbl_discord_avatar' class='disabled'>Override Avatar URL</label>"+
+            "<input type='text' id='discord_avatar' class='TextboxLarge' disabled='true' />"+
+            "</div>" +
+            "<div>" +
+            "<label for='discord_pushuser' id='lbl_discord_pushuser' class='disabled'>Override Push Username</label>"+
+            "<input type='text' id='discord_pushuser' class='TextboxLarge' disabled='true' />"+
+            "</div>" +
             "<div class='checkbox'>" +
             "<input type='checkbox' id='discord_addition' disabled='true' />"+
             "<label for='discord_addition' id='lbl_discord_addition' class='disabled'>Addition</label>"+

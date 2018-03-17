@@ -15,6 +15,8 @@ class Discord {
         "discord_finish"=>0,
         "discord_deletion"=>0,
         "discord_webhook"=>'',
+        "discord_avatar"=>'',
+        "discord_pushuser"=>'',
     );
 
     public function store()
@@ -32,7 +34,7 @@ class Discord {
             foreach($vars as $var)
             {
                 $parts = explode("=",$var);
-                $this->log[$parts[0]] = ($parts[0]=='discord_webhook') ? $parts[1] : intval($parts[1]);
+                $this->log[$parts[0]] = in_array($parts[0], array('discord_webhook', 'discord_avatar', 'discord_pushuser')) ? $parts[1] : intval($parts[1]);
             }
             $this->store();
             $this->setHandlers();
@@ -105,6 +107,8 @@ class Discord {
                 $ar->log["discord_finish"] = 0;
                 $ar->log["discord_deletion"] = 0;
                 $ar->log["discord_webhook"] = '';
+                $ar->log["discord_avatar"] = '';
+                $ar->log["discord_pushuser"] = '';
             }
         }
         return($ar);
@@ -139,9 +143,15 @@ class Discord {
             $data['tracker'],
         );
         $body = str_replace( $fields, $values, $section );
+        $payload = array("content" => $body);
+        if (!empty($this->log['discord_avatar']))
+            $payload["avatar_url"] = $this->log["discord_avatar"];
+        if (!empty($this->log['discord_pushuser']))
+            $payload["username"] = $this->log["discord_pushuser"];
+
         $ch = curl_init($this->log['discord_webhook']);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("content" => $body)));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $res = curl_exec($ch);
