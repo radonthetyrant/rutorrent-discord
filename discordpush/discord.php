@@ -119,41 +119,76 @@ class Discord {
         global $discordNotifications;
         $actions = array
         (
-            1 => 'addition',
-            2 => 'finish',
-            3 => 'deletion',
+            1 => 'Added',
+            2 => 'Finished',
+            3 => 'Deleted',
         );
-        $section = $discordNotifications[$actions[$data['action']]];
-        $fields = array
-        (
-            '{name}', '{label}', '{size}', '{downloaded}', '{uploaded}', '{ratio}',
-            '{creation}', '{added}', '{finished}', '{tracker}',
-        );
-        $values = array
-        (
-            $data['name'],
-            $data['label'],
-            self::bytes($data['size']),
-            self::bytes($data['downloaded']),
-            self::bytes($data['uploaded']),
-            $data['ratio'],
-            strftime('%c',$data['creation']),
-            strftime('%c',$data['added']),
-            strftime('%c',$data['finished']),
-            $data['tracker'],
-        );
-        $body = str_replace( $fields, $values, $section );
-        $payload = array("content" => $body);
-        if (!empty($this->log['discord_avatar']))
-            $payload["avatar_url"] = $this->log["discord_avatar"];
-        if (!empty($this->log['discord_pushuser']))
-            $payload["username"] = $this->log["discord_pushuser"];
+        //$section = $discordNotifications[$actions[$data['action']]];
+        $fields = array();
+
+        switch ($data['action']) {
+            case 1:
+                $fields[] = array("name" => "Name", "value" => $data['name']);
+                $fields[] = array("name" => "Label", "value" => $data['label']);
+                $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
+                $fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
+                $fields[] = array("name" => "Tracker", "value" => $data['tracker']);
+                break;
+            case 2:
+                $fields[] = array("name" => "Name", "value" => $data['name']);
+                $fields[] = array("name" => "Label", "value" => $data['label']);
+                $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
+                $fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
+                $fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
+                $fields[] = array("name" => "Ratio", "value" => $data['ratio']);
+                $fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
+                $fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
+                $fields[] = array("name" => "Tracker", "value" => $data['tracker']);
+                break;
+            case 3:
+                $fields[] = array("name" => "Name", "value" => $data['name']);
+                $fields[] = array("name" => "Label", "value" => $data['label']);
+                $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
+                $fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
+                $fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
+                $fields[] = array("name" => "Ratio", "value" => $data['ratio']);
+                $fields[] = array("name" => "Creation", "value" => strftime('%c',$data['creation']));
+                $fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
+                $fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
+                $fields[] = array("name" => "Tracker", "value" => $data['tracker']);
+                break;
+        }
+
+        $avatarUrl = !empty($this->log['discord_avatar']) ? $this->log['discord_avatar'] : null;
+        $botUsername = !empty($this->log['discord_pushuser']) ? $this->log['discord_pushuser'] : null;
+
+        $payload = json_encode(array(
+            "content" => "",
+            'avatar_url' => $avatarUrl,
+            "username" => $botUsername,
+            "embeds" => array(
+                array(
+                    "title" => "Torrent ".$actions[$data['action']].".",
+                    "color" => 1251255,
+                    "timestamp" => date('Y-m-d\TH:i:s.u'),
+                    "thumbnail" => array(
+                        "url" => $avatarUrl
+                    ),
+                    "author" => array(
+                        "name" => "rutorrent-discord"
+                    ),
+                    "fields" => $fields
+                )
+            )
+        ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
 
         $ch = curl_init($this->log['discord_webhook']);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Length: '.strlen($payload)));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $res = curl_exec($ch);
         curl_close($ch);
     }
