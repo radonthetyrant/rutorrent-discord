@@ -14,3 +14,9 @@ https://discordapp.com/developers/docs/resources/webhook
 * go to settings > Discord
 * Enable, tick what evens should be notified
 * Paste webhook url you got from your respective channel settings where you want the notifications to appear
+
+# Changelog
+
+* **05.04.2018**
+  * Overhauled discord messages, now uses embed rather than a text message
+  * Filesize numbers are now properly rounded
