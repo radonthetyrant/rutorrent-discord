@@ -131,31 +131,31 @@ class Discord {
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                $fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
-                $fields[] = array("name" => "Tracker", "value" => $data['tracker']);
+                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
+                $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 break;
             case 2:
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                $fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
-                $fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
-                $fields[] = array("name" => "Ratio", "value" => $data['ratio']);
-                $fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
-                $fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
-                $fields[] = array("name" => "Tracker", "value" => $data['tracker']);
+                //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
+                //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
+                //$fields[] = array("name" => "Ratio", "value" => $data['ratio']);
+                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
+                //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
+                $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 break;
             case 3:
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                $fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
-                $fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
-                $fields[] = array("name" => "Ratio", "value" => $data['ratio']);
-                $fields[] = array("name" => "Creation", "value" => strftime('%c',$data['creation']));
-                $fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
-                $fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
-                $fields[] = array("name" => "Tracker", "value" => $data['tracker']);
+                //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
+                //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
+                //$fields[] = array("name" => "Ratio", "value" => $data['ratio']);
+                //$fields[] = array("name" => "Creation", "value" => strftime('%c',$data['creation']));
+                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
+                //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
+                $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 break;
         }
 
@@ -168,7 +168,7 @@ class Discord {
             "username" => $botUsername,
             "embeds" => array(
                 array(
-                    "title" => "Torrent ".$actions[$data['action']].".",
+                    "title" => "Torrent ".$actions[$data['action']].": ".$data['name'],
                     "color" => 1251255,
                     "timestamp" => date('Y-m-d\TH:i:s.u'),
                     "thumbnail" => array(
