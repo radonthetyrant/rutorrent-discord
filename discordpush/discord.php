@@ -129,14 +129,14 @@ class Discord {
         switch ($data['action']) {
             case 1:
                 $fields[] = array("name" => "Name", "value" => $data['name']);
-                $fields[] = array("name" => "Label", "value" => $data['label']);
+                if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 break;
             case 2:
                 $fields[] = array("name" => "Name", "value" => $data['name']);
-                $fields[] = array("name" => "Label", "value" => $data['label']);
+                if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
                 //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
@@ -147,7 +147,7 @@ class Discord {
                 break;
             case 3:
                 $fields[] = array("name" => "Name", "value" => $data['name']);
-                $fields[] = array("name" => "Label", "value" => $data['label']);
+                if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
                 //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
