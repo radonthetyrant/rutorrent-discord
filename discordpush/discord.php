@@ -133,7 +133,7 @@ class Discord {
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
-				$color = 4886754;
+                $color = 4886754;
                 break;
             case 2:
                 $fields[] = array("name" => "Name", "value" => $data['name']);
@@ -145,7 +145,7 @@ class Discord {
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
-				$color = 8311585;
+                $color = 8311585;
                 break;
             case 3:
                 $fields[] = array("name" => "Name", "value" => $data['name']);
@@ -158,16 +158,10 @@ class Discord {
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
-				$color = 10562619;
+                $color = 10562619;
                 break;
         }
 
-		
-		
-		
-		
-		
-		
         $avatarUrl = !empty($this->log['discord_avatar']) ? $this->log['discord_avatar'] : null;
         $botUsername = !empty($this->log['discord_pushuser']) ? $this->log['discord_pushuser'] : null;
 
@@ -178,10 +172,7 @@ class Discord {
             "embeds" => array(
                 array(
                     "title" => "Torrent ".$actions[$data['action']].": ".$data['name'],
-					"color" => $color,
-					
-					
-                    //"color" => 1251255,
+                    "color" => $color,
                     "timestamp" => date('Y-m-d\TH:i:s.u'),
                     "thumbnail" => array(
                         "url" => $avatarUrl
