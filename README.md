@@ -11,6 +11,7 @@ And if discord is properly set up, displays desktop notifications the moment a t
 
 # Install
 
+* Make sure you have php-curl installed
 * download/clone repo
 * add discordpush to your rutorrent/plugins directory
 * reload webinterface
