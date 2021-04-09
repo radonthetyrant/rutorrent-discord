@@ -17,6 +17,7 @@ class Discord {
         "discord_webhook"=>'',
         "discord_avatar"=>'',
         "discord_pushuser"=>'',
+        "discord_mentionuser"=>'',
     );
 
     public function store()
@@ -34,7 +35,7 @@ class Discord {
             foreach($vars as $var)
             {
                 $parts = explode("=",$var);
-                $this->log[$parts[0]] = in_array($parts[0], array('discord_webhook', 'discord_avatar', 'discord_pushuser')) ? $parts[1] : intval($parts[1]);
+                $this->log[$parts[0]] = in_array($parts[0], array('discord_webhook', 'discord_avatar', 'discord_pushuser','discord_mentionuser')) ? $parts[1] : intval($parts[1]);
             }
             $this->store();
             $this->setHandlers();
@@ -109,6 +110,7 @@ class Discord {
                 $ar->log["discord_webhook"] = '';
                 $ar->log["discord_avatar"] = '';
                 $ar->log["discord_pushuser"] = '';
+                $ar->log["discord_mentionuser"] = '';
             }
         }
         return($ar);
@@ -164,9 +166,15 @@ class Discord {
 
         $avatarUrl = !empty($this->log['discord_avatar']) ? $this->log['discord_avatar'] : null;
         $botUsername = !empty($this->log['discord_pushuser']) ? $this->log['discord_pushuser'] : null;
+        $mention = !empty($this->log['discord_mentionuser']) ? $this->log['discord_mentionuser'] : null;
+        
+        $content = "";
+        if ($mention != "") {
+            $content = "<@" . $mention . ">";
+        }
 
         $payload = json_encode(array(
-            "content" => "",
+            "content" => $content,
             'avatar_url' => $avatarUrl,
             "username" => $botUsername,
             "embeds" => array(
