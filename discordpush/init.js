@@ -14,7 +14,7 @@ if(plugin.canChangeOptions())
             $('#discord_webhook').val( theWebUI.discord.discord_webhook );
             $('#discord_avatar').val( theWebUI.discord.discord_avatar );
             $('#discord_pushuser').val( theWebUI.discord.discord_pushuser );
-            $('#discord_mentionuser').val( theWebUI.discord.discord_pushover );
+            $('#discord_mentionuser').val( theWebUI.discord.discord_mentionuser );
             $$('discord_enabled').checked = ( theWebUI.discord.discord_enabled != 0 );
             $$('discord_addition').checked = ( theWebUI.discord.discord_addition != 0 );
             $$('discord_finish').checked = ( theWebUI.discord.discord_finish != 0 );
