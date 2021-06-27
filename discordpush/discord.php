@@ -143,7 +143,10 @@ class Discord {
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
                 //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
-                //$fields[] = array("name" => "Ratio", "value" => $data['ratio']);
+                if (isset($data['discord_ratio']) && $data['discord_ratio'] && isset($data['ratio'])) {
+                     $ratio = $data['ratio'] / 1000;
+                     $fields[] = array("name" => "Ratio", "value" => $ratio);
+                }
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
@@ -155,7 +158,10 @@ class Discord {
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
                 //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
-                //$fields[] = array("name" => "Ratio", "value" => $data['ratio']);
+                if (isset($data['discord_ratio']) && $data['discord_ratio'] && isset($data['ratio'])) {
+                     $ratio = $data['ratio'] / 1000;
+                     $fields[] = array("name" => "Ratio", "value" => $ratio);
+                }
                 //$fields[] = array("name" => "Creation", "value" => strftime('%c',$data['creation']));
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
