@@ -14,9 +14,11 @@ class Discord {
         "discord_addition"=>0,
         "discord_finish"=>0,
         "discord_deletion"=>0,
+        "discord_ratio"=>0,
         "discord_webhook"=>'',
         "discord_avatar"=>'',
         "discord_pushuser"=>'',
+        "discord_mentionuser"=>'',
     );
 
     public function store()
@@ -34,7 +36,7 @@ class Discord {
             foreach($vars as $var)
             {
                 $parts = explode("=",$var);
-                $this->log[$parts[0]] = in_array($parts[0], array('discord_webhook', 'discord_avatar', 'discord_pushuser')) ? $parts[1] : intval($parts[1]);
+                $this->log[$parts[0]] = in_array($parts[0], array('discord_webhook', 'discord_avatar', 'discord_pushuser','discord_mentionuser')) ? $parts[1] : intval($parts[1]);
             }
             $this->store();
             $this->setHandlers();
@@ -106,9 +108,11 @@ class Discord {
                 $ar->log["discord_addition"] = 0;
                 $ar->log["discord_finish"] = 0;
                 $ar->log["discord_deletion"] = 0;
+                $ar->log["discord_ratio"] = 0;
                 $ar->log["discord_webhook"] = '';
                 $ar->log["discord_avatar"] = '';
                 $ar->log["discord_pushuser"] = '';
+                $ar->log["discord_mentionuser"] = '';
             }
         }
         return($ar);
@@ -132,6 +136,10 @@ class Discord {
                 if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
+                if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
+                    $ratio = round($data['ratio'] / 1000,2);
+                    $fields[] = array("name" => "Ratio", $value => strval($ratio));
+                }
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 $color = 4886754;
                 break;
@@ -141,7 +149,10 @@ class Discord {
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
                 //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
-                //$fields[] = array("name" => "Ratio", "value" => $data['ratio']);
+                if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
+                    $ratio = round($data['ratio'] / 1000,2);
+                    $fields[] = array("name" => "Ratio", $value => strval($ratio));
+                }
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
@@ -153,7 +164,10 @@ class Discord {
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
                 //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
                 //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
-                //$fields[] = array("name" => "Ratio", "value" => $data['ratio']);
+                if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
+                    $ratio = round($data['ratio'] / 1000,2);
+                    $fields[] = array("name" => "Ratio", $value => strval($ratio));
+                }
                 //$fields[] = array("name" => "Creation", "value" => strftime('%c',$data['creation']));
                 //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
@@ -164,9 +178,15 @@ class Discord {
 
         $avatarUrl = !empty($this->log['discord_avatar']) ? $this->log['discord_avatar'] : null;
         $botUsername = !empty($this->log['discord_pushuser']) ? $this->log['discord_pushuser'] : null;
+        $mention = !empty($this->log['discord_mentionuser']) ? $this->log['discord_mentionuser'] : null;
+        
+        $content = "";
+        if ($mention != "") {
+            $content = "<@" . $mention . ">";
+        }
 
         $payload = json_encode(array(
-            "content" => "",
+            "content" => $content,
             'avatar_url' => $avatarUrl,
             "username" => $botUsername,
             "embeds" => array(
