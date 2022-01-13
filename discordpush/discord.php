@@ -3,7 +3,7 @@
 require_once( dirname(__FILE__).'/../../php/cache.php');
 require_once( dirname(__FILE__).'/../../php/util.php');
 require_once( dirname(__FILE__).'/../../php/settings.php');
-eval(getPluginConf('discordpush'));
+eval(FileUtil::getPluginConf('discordpush'));
 
 class Discord {
 
@@ -42,10 +42,10 @@ class Discord {
     }
     public function get()
     {
-        if (function_exists("safe_json_encode")) {
-            return("theWebUI.discord = ".safe_json_encode($this->log).";");
+        if (method_exists('JSON', 'safeEncode')) {
+            return("theWebUI.discord = ".JSON::safeEncode($this->log).";");
         } else {
-            // We dont really need safe_json_encode here since we dont store any values other than numeric and hash values, but sometimes this throws an error
+            // We dont really need JSON::safeEncode here since we dont store any values other than numeric and hash values, but sometimes this throws an error
             return("theWebUI.discord = ".json_encode($this->log).";");
         }
     }
@@ -55,40 +55,40 @@ class Discord {
         global $rootPath;
         if($this->log["discord_enabled"] && $this->log["discord_addition"])
         {
-            $addCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',1,$'.
+            $addCmd = getCmd('execute').'={'.Utility::getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',1,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+                User::getUser().'}';
         }
         else
             $addCmd = getCmd('cat=');
         if($this->log["discord_enabled"] && $this->log["discord_finish"])
-            $finCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',2,$'.
+            $finCmd = getCmd('execute').'={'.Utility::getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',2,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+                User::getUser().'}';
         else
             $finCmd = getCmd('cat=');
         if($this->log["discord_enabled"] && $this->log["discord_deletion"])
-            $delCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',3,$'.
+            $delCmd = getCmd('execute').'={'.Utility::getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',3,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+                User::getUser().'}';
         else
             $delCmd = getCmd('cat=');
         $req = new rXMLRPCRequest( array(
-            rTorrentSettings::get()->getOnInsertCommand( array('tdiscord'.getUser(), $addCmd ) ),
-            rTorrentSettings::get()->getOnFinishedCommand( array('tdiscord'.getUser(), $finCmd ) ),
-            rTorrentSettings::get()->getOnEraseCommand( array('tdiscord'.getUser(), $delCmd ) ),
+            rTorrentSettings::get()->getOnInsertCommand( array('tdiscord'.User::getUser(), $addCmd ) ),
+            rTorrentSettings::get()->getOnFinishedCommand( array('tdiscord'.User::getUser(), $finCmd ) ),
+            rTorrentSettings::get()->getOnEraseCommand( array('tdiscord'.User::getUser(), $delCmd ) ),
         ));
         $res = $req->success();
         return($res);
