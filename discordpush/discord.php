@@ -3,7 +3,10 @@
 require_once( dirname(__FILE__).'/../../php/cache.php');
 require_once( dirname(__FILE__).'/../../php/util.php');
 require_once( dirname(__FILE__).'/../../php/settings.php');
-eval(getPluginConf('discordpush'));
+
+if (function_exists('getPluginConf')) {
+    eval(getPluginConf('discordpush'));
+}
 
 class Discord {
 
@@ -55,42 +58,52 @@ class Discord {
     public function setHandlers()
     {
         global $rootPath;
+        if (function_exists('getPHP')) {
+            $getPHPStr = getPHP();
+        } else {
+            $getPHPStr = Utility::getPHP();
+        }
+        if (function_exists('getUser')) {
+            $getUserStr = getUser();
+        } else {
+            $getUserStr = User::getUser();
+        }
         if($this->log["discord_enabled"] && $this->log["discord_addition"])
         {
-            $addCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',1,$'.
+            $addCmd = getCmd('execute').'={'.$getPHPStr.','.$rootPath.'/plugins/discordpush/push.php'.',1,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+                $getUserStr.'}';
         }
         else
             $addCmd = getCmd('cat=');
         if($this->log["discord_enabled"] && $this->log["discord_finish"])
-            $finCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',2,$'.
+            $finCmd = getCmd('execute').'={'.$getPHPStr.','.$rootPath.'/plugins/discordpush/push.php'.',2,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+                $getUserStr.'}';
         else
             $finCmd = getCmd('cat=');
         if($this->log["discord_enabled"] && $this->log["discord_deletion"])
-            $delCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',3,$'.
+            $delCmd = getCmd('execute').'={'.$getPHPStr.','.$rootPath.'/plugins/discordpush/push.php'.',3,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+               $getUserStr.'}';
         else
             $delCmd = getCmd('cat=');
         $req = new rXMLRPCRequest( array(
-            rTorrentSettings::get()->getOnInsertCommand( array('tdiscord'.getUser(), $addCmd ) ),
-            rTorrentSettings::get()->getOnFinishedCommand( array('tdiscord'.getUser(), $finCmd ) ),
-            rTorrentSettings::get()->getOnEraseCommand( array('tdiscord'.getUser(), $delCmd ) ),
+            rTorrentSettings::get()->getOnInsertCommand( array('tdiscord'.$getUserStr, $addCmd ) ),
+            rTorrentSettings::get()->getOnFinishedCommand( array('tdiscord'.$getUserStr, $finCmd ) ),
+            rTorrentSettings::get()->getOnEraseCommand( array('tdiscord'.$getUserStr, $delCmd ) ),
         ));
         $res = $req->success();
         return($res);
