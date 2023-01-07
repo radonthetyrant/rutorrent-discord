@@ -25,6 +25,9 @@ You need to get your webhook URL from your Discord server, see here for how to d
 * If you want to use Discord notifications on the iOS app, then you'll need to include your Discord user ID (so that the events 'mention' your user and therefore trigger a notification). See here for how to find your user ID: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
 
 # Changelog
+* **07.01.2023**
+  * This has been updated to work with ruTorrent v4 (should still be compatible with v3)
+  
 * **01.07.2021**
   * This version now fixes the inclusion of the 'ratio' value
   * This also enables you to specifically 'mention' a Discord user in the pushed message (which enables proper iOS notifications)
