@@ -140,7 +140,6 @@ class Discord {
             2 => 'Finished',
             3 => 'Deleted',
         );
-        //$section = $discordNotifications[$actions[$data['action']]];
         $fields = array();
 
         switch ($data['action']) {
@@ -148,10 +147,9 @@ class Discord {
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
                 if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
                     $ratio = round($data['ratio'] / 1000,2);
-                    $fields[] = array("name" => "Ratio", $value => strval($ratio));
+                    $fields[] = array("name" => "Ratio", "value" => strval($ratio));
                 }
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 $color = 4886754;
@@ -160,14 +158,10 @@ class Discord {
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
-                //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
                 if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
                     $ratio = round($data['ratio'] / 1000,2);
-                    $fields[] = array("name" => "Ratio", $value => strval($ratio));
+                    $fields[] = array("name" => "Ratio", "value" => strval($ratio));
                 }
-                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
-                //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 $color = 8311585;
                 break;
@@ -175,15 +169,10 @@ class Discord {
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
-                //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
                 if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
                     $ratio = round($data['ratio'] / 1000,2);
-                    $fields[] = array("name" => "Ratio", $value => strval($ratio));
+                    $fields[] = array("name" => "Ratio", "value" => strval($ratio));
                 }
-                //$fields[] = array("name" => "Creation", "value" => strftime('%c',$data['creation']));
-                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
-                //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 $color = 10562619;
                 break;
@@ -201,7 +190,6 @@ class Discord {
         $payload = json_encode(array(
             "content" => $content,
             'avatar_url' => $avatarUrl,
-            "username" => $botUsername,
             "embeds" => array(
                 array(
                     "title" => "Torrent ".$actions[$data['action']].": ".$data['name'],
