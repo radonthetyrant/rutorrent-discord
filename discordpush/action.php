@@ -10,13 +10,21 @@ if(isset($_REQUEST['cmd']))
         {
             $up = Discord::load();
             $up->set();
-            cachedEcho($up->get(),"application/javascript");
+            if (function_exists('cachedEcho')) {
+                cachedEcho($up->get(),"application/javascript");
+            } else {
+                CachedEcho::send($up->get(),"application/javascript");
+            }
             break;
         }
         case "get":
         {
             $up = rHistoryData::load();
-            cachedEcho(safe_json_encode($up->get($_REQUEST['mark'])),"application/json");
+            if (function_exists('cachedEcho')) {
+                cachedEcho(safe_json_encode($up->get($_REQUEST['mark'])),"application/json");
+            } else {
+                CachedEcho::send(safe_json_encode($up->get($_REQUEST['mark'])),"application/json");
+            }
             break;
         }
         case "delete":
@@ -35,7 +43,11 @@ if(isset($_REQUEST['cmd']))
                 }
                 $up->delete( $hashes );
             }
-            cachedEcho(safe_json_encode($up->get(0)),"application/json");
+            if (function_exists('cachedEcho')) {
+                cachedEcho(safe_json_encode($up->get(0)),"application/json");
+            } else {
+                CachedEcho::send(safe_json_encode($up->get(0)),"application/json");
+            }
             break;
         }
     }

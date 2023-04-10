@@ -3,7 +3,10 @@
 require_once( dirname(__FILE__).'/../../php/cache.php');
 require_once( dirname(__FILE__).'/../../php/util.php');
 require_once( dirname(__FILE__).'/../../php/settings.php');
-eval(getPluginConf('discordpush'));
+
+if (function_exists('getPluginConf')) {
+    eval(getPluginConf('discordpush'));
+}
 
 class Discord {
 
@@ -14,9 +17,11 @@ class Discord {
         "discord_addition"=>0,
         "discord_finish"=>0,
         "discord_deletion"=>0,
+        "discord_ratio"=>0,
         "discord_webhook"=>'',
         "discord_avatar"=>'',
         "discord_pushuser"=>'',
+        "discord_mentionuser"=>'',
     );
 
     public function store()
@@ -34,7 +39,7 @@ class Discord {
             foreach($vars as $var)
             {
                 $parts = explode("=",$var);
-                $this->log[$parts[0]] = in_array($parts[0], array('discord_webhook', 'discord_avatar', 'discord_pushuser')) ? $parts[1] : intval($parts[1]);
+                $this->log[$parts[0]] = in_array($parts[0], array('discord_webhook', 'discord_avatar', 'discord_pushuser','discord_mentionuser')) ? $parts[1] : intval($parts[1]);
             }
             $this->store();
             $this->setHandlers();
@@ -53,42 +58,52 @@ class Discord {
     public function setHandlers()
     {
         global $rootPath;
+        if (function_exists('getPHP')) {
+            $getPHPStr = getPHP();
+        } else {
+            $getPHPStr = Utility::getPHP();
+        }
+        if (function_exists('getUser')) {
+            $getUserStr = getUser();
+        } else {
+            $getUserStr = User::getUser();
+        }
         if($this->log["discord_enabled"] && $this->log["discord_addition"])
         {
-            $addCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',1,$'.
+            $addCmd = getCmd('execute').'={'.$getPHPStr.','.$rootPath.'/plugins/discordpush/push.php'.',1,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+                $getUserStr.'}';
         }
         else
             $addCmd = getCmd('cat=');
         if($this->log["discord_enabled"] && $this->log["discord_finish"])
-            $finCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',2,$'.
+            $finCmd = getCmd('execute').'={'.$getPHPStr.','.$rootPath.'/plugins/discordpush/push.php'.',2,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+                $getUserStr.'}';
         else
             $finCmd = getCmd('cat=');
         if($this->log["discord_enabled"] && $this->log["discord_deletion"])
-            $delCmd = getCmd('execute').'={'.getPHP().','.$rootPath.'/plugins/discordpush/push.php'.',3,$'.
+            $delCmd = getCmd('execute').'={'.$getPHPStr.','.$rootPath.'/plugins/discordpush/push.php'.',3,$'.
                 getCmd('d.get_name').'=,$'.getCmd('d.get_size_bytes').'=,$'.getCmd('d.get_bytes_done').'=,$'.
                 getCmd('d.get_up_total').'=,$'.getCmd('d.get_ratio').'=,$'.getCmd('d.get_creation_date').'=,$'.
                 getCmd('d.get_custom').'=addtime,$'.getCmd('d.get_custom').'=seedingtime'.
                 ',"$'.getCmd('t.multicall').'=$'.getCmd('d.get_hash').'=,'.getCmd('t.get_url').'=,'.getCmd('cat').'=#",$'.
                 getCmd('d.get_custom1')."=,$".getCmd('d.get_custom')."=x-pushbullet,".
-                getUser().'}';
+               $getUserStr.'}';
         else
             $delCmd = getCmd('cat=');
         $req = new rXMLRPCRequest( array(
-            rTorrentSettings::get()->getOnInsertCommand( array('tdiscord'.getUser(), $addCmd ) ),
-            rTorrentSettings::get()->getOnFinishedCommand( array('tdiscord'.getUser(), $finCmd ) ),
-            rTorrentSettings::get()->getOnEraseCommand( array('tdiscord'.getUser(), $delCmd ) ),
+            rTorrentSettings::get()->getOnInsertCommand( array('tdiscord'.$getUserStr, $addCmd ) ),
+            rTorrentSettings::get()->getOnFinishedCommand( array('tdiscord'.$getUserStr, $finCmd ) ),
+            rTorrentSettings::get()->getOnEraseCommand( array('tdiscord'.$getUserStr, $delCmd ) ),
         ));
         $res = $req->success();
         return($res);
@@ -106,9 +121,11 @@ class Discord {
                 $ar->log["discord_addition"] = 0;
                 $ar->log["discord_finish"] = 0;
                 $ar->log["discord_deletion"] = 0;
+                $ar->log["discord_ratio"] = 0;
                 $ar->log["discord_webhook"] = '';
                 $ar->log["discord_avatar"] = '';
                 $ar->log["discord_pushuser"] = '';
+                $ar->log["discord_mentionuser"] = '';
             }
         }
         return($ar);
@@ -123,7 +140,6 @@ class Discord {
             2 => 'Finished',
             3 => 'Deleted',
         );
-        //$section = $discordNotifications[$actions[$data['action']]];
         $fields = array();
 
         switch ($data['action']) {
@@ -131,7 +147,10 @@ class Discord {
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
+                if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
+                    $ratio = round($data['ratio'] / 1000,2);
+                    $fields[] = array("name" => "Ratio", "value" => strval($ratio));
+                }
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 $color = 4886754;
                 break;
@@ -139,11 +158,10 @@ class Discord {
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
-                //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
-                //$fields[] = array("name" => "Ratio", "value" => $data['ratio']);
-                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
-                //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
+                if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
+                    $ratio = round($data['ratio'] / 1000,2);
+                    $fields[] = array("name" => "Ratio", "value" => strval($ratio));
+                }
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 $color = 8311585;
                 break;
@@ -151,12 +169,10 @@ class Discord {
                 $fields[] = array("name" => "Name", "value" => $data['name']);
                 if (!empty($data['label'])) $fields[] = array("name" => "Label", "value" => $data['label']);
                 $fields[] = array("name" => "Size", "value" => self::bytes(round($data['size'],2)));
-                //$fields[] = array("name" => "Downloaded", "value" => self::bytes(round($data['downloaded'],2)));
-                //$fields[] = array("name" => "Uploaded", "value" => self::bytes(round($data['uploaded'],2)));
-                //$fields[] = array("name" => "Ratio", "value" => $data['ratio']);
-                //$fields[] = array("name" => "Creation", "value" => strftime('%c',$data['creation']));
-                //$fields[] = array("name" => "Added", "value" => strftime('%c',$data['added']));
-                //$fields[] = array("name" => "Finished", "value" => strftime('%c',$data['finished']));
+                if ($this->log['discord_ratio'] && !empty($data['ratio']) && $data['ratio'] > 0) {
+                    $ratio = round($data['ratio'] / 1000,2);
+                    $fields[] = array("name" => "Ratio", "value" => strval($ratio));
+                }
                 $fields[] = array("name" => "Tracker", "value" => parse_url($data['tracker'], PHP_URL_HOST));
                 $color = 10562619;
                 break;
@@ -164,11 +180,16 @@ class Discord {
 
         $avatarUrl = !empty($this->log['discord_avatar']) ? $this->log['discord_avatar'] : null;
         $botUsername = !empty($this->log['discord_pushuser']) ? $this->log['discord_pushuser'] : null;
+        $mention = !empty($this->log['discord_mentionuser']) ? $this->log['discord_mentionuser'] : null;
+        
+        $content = "";
+        if ($mention != "") {
+            $content = "<@" . $mention . ">";
+        }
 
         $payload = json_encode(array(
-            "content" => "",
+            "content" => $content,
             'avatar_url' => $avatarUrl,
-            "username" => $botUsername,
             "embeds" => array(
                 array(
                     "title" => "Torrent ".$actions[$data['action']].": ".$data['name'],
